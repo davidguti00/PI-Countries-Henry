@@ -14,7 +14,7 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        img:{
+        image:{
             type: DataTypes.STRING,
             allowNull:  false
         },
@@ -23,15 +23,15 @@ module.exports = (sequelize) => {
             allowNull: false
         },
         capital:{
-            type: DataTypes.STRING, 
+            type: DataTypes.ARRAY(DataTypes.STRING), 
             allowNull: false
         },
-        subregion:{
+        subRegion:{
             type: DataTypes.STRING,
             allowNull: true
         },
         area:{
-            type: DataTypes.INTEGER,
+            type: DataTypes.FLOAT,
             allowNull: true
         },
         population:{

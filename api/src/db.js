@@ -2,13 +2,10 @@ require('dotenv').config();
 const { Sequelize } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 const {
   DB_USER, DB_PASSWORD, DB_HOST,
 } = process.env;
-
-// const modelActivity = require('./models/Activity.js');
-// const modelCountry = require('./models/Country.js');
-
 
 const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/countries`, {
   logging: false, // set to console.log to see the raw SQL queries
@@ -41,7 +38,23 @@ const { Activity, Country } = sequelize.models;
 Country.belongsToMany(Activity, {through: 'Country_activities' });
 Activity.belongsToMany(Country, {through: 'Country_activities' });
 
+const allcountries = axios.get('https://restcountries.com/v3/all')
+.then(response => response.data)
 
+allcountries.then(r =>{
+      r.map( e => {
+      Country.create({
+          id : e.cca3,
+          name: e.name.common,
+          image: e.flags[0],
+          continent: e.continents[0],
+          capital: e.capital || ["Has no capital"],
+          subRegion: e.subregion || "Does not have",
+          area: e.area,
+          population: e.population
+      })
+      })
+});
 
 
 module.exports = {
