@@ -7,12 +7,13 @@ const axios = require ('axios');
 
 
 router.post('/', async (req,res,next) =>{
-    const{name, difficulty, duration, season, type, countries } = req.body
+    const{name, difficulty, duration, season, countries } = req.body
     try{
-        if(name && difficulty && duration && season && type && countries){ 
+        if(name && difficulty && duration && season && countries){ 
         const newActivity = await Activity.create({
-            name, difficulty, duration, season, type 
+            name, difficulty, duration, season, 
         })
+        
         const countriesByName = await Country.findAll({
             where: {
                 name: {
@@ -20,6 +21,7 @@ router.post('/', async (req,res,next) =>{
                 }
             }
         })
+        
         countriesByName.forEach(e => {
             return  newActivity.addCountry(e.dataValues.id)
         });

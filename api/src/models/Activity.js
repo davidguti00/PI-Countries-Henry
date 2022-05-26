@@ -24,10 +24,7 @@ module.exports = (sequelize) => {
             values: ['Summer', 'Fall', 'Spring', 'Winter']
             })
         },
-        type:{
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
+        
     },
     {timestamps: false})
 }

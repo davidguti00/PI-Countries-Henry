@@ -43,15 +43,19 @@ const allcountries = axios.get('https://restcountries.com/v3/all')
 
 allcountries.then(r =>{
       r.map( e => {
-      Country.create({
-          id : e.cca3,
-          name: e.name.common,
-          image: e.flags[0],
-          continent: e.continents[0],
-          capital: e.capital || ["Has no capital"],
-          subRegion: e.subregion || "Does not have",
-          area: e.area,
-          population: e.population
+      Country.findOrCreate({
+        where:{id: e.cca3},
+          defaults:{
+            id : e.cca3,
+            name: e.name.common,
+            image: e.flags[0],
+            continent: e.continents[0],
+            capital: e.capital,
+            subRegion: e.subregion || "Does not have",
+            area: e.area,
+            population: e.population
+          }
+          
       })
       })
 });

@@ -5,8 +5,11 @@ const router = Router();
 const axios = require ('axios');
 
 
-
 router.get('/', async(req, res, next)=>{
+    
+    const {name} = req.query;
+    const nameM = name[0].toUpperCase() + name.slice(1).toLowerCase();
+    
     try {
 
         const allCountries = (await axios('https://restcountries.com/v3/all')).data.map(e=>({
@@ -18,23 +21,33 @@ router.get('/', async(req, res, next)=>{
             subRegion: e.subregion || "Does not have",
             area: e.area,
             population: e.population
-        }))
-        return  res.json(allCountries)
+        }));
+        if(name){
+            const countryName = await allCountries.filter(e=>e.name.includes(nameM));
+            
+                if(countryName.length){
+                res.json(countryName);
+                
+            } else {
+                return res.send("Country has not been created yet")
+            }
+        }else{
+            return  res.json(allCountries) 
+        }
 
     }catch (error){
         next(error);
     }
 });
 
-//GET /countries/{idPais}:
-//Obtener el detalle de un país en particular
-//Debe traer solo los datos pedidos en la ruta de detalle de país
-//Incluir los datos de las actividades turísticas correspondientes
+
 router.get('/:id',async (req,res,next) => {
-    const idcountry = req.params.id;
+    const idCountry = req.params.id;
+    const idCountryM = idCountry.toUpperCase();
+    
     try{
         const country = await Country.findOne({
-            where: { code: idcountry },
+            where: { id: idCountryM },
             include: Activity
         });;
 
