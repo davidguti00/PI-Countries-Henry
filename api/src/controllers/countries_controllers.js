@@ -1,14 +1,15 @@
-
+const {Op} = require ('sequelize')
 const { Country, Activity } = require ('../db')
-const { Router } = require ('express');
+const { Router, query } = require ('express');
 const router = Router();
 const axios = require ('axios');
 
 
 router.get('/', async(req, res, next)=>{
     
-    const {name} = req.query;
-    const nameM = name[0].toUpperCase() + name.slice(1).toLowerCase();
+    const {name, continent, order, population} = req.query;
+    
+    
     
     try {
 
@@ -22,19 +23,66 @@ router.get('/', async(req, res, next)=>{
             area: e.area,
             population: e.population
         }));
+        
         if(name){
-            const countryName = await allCountries.filter(e=>e.name.includes(nameM));
-            
-                if(countryName.length){
-                res.json(countryName);
-                
-            } else {
-                return res.send("Country has not been created yet")
+            try{
+                let nameDb = await Country.findAll({
+                    where:{
+                        name:{[Op.iLike]: `%` + name + `%`},    
+                    },
+                        order: [['name', 'ASC']],
+                });
+                if(nameDb.length){
+                    return res.json(nameDb)
+                } else {
+                    return res.send("Country has not been created yet")
+                }
+            } catch (error){
+                next(error)
             }
-        }else{
-            return  res.json(allCountries) 
+        } 
+
+        else if(continent){
+            try{
+                let continentM = await Country.findAll({
+                    where:{
+                        continent: continent
+                    },
+                        order: [['name', 'ASC']],
+                        limit: 9
+
+                });
+                return res.json(continentM)
+            }catch (error){
+                next(error);
+            }
+        }
+        
+        else if(order){
+            try{
+                let countriesOrder = await Country.findAll({
+                    order: [['name', order]],
+                });
+                    return res.json(countriesOrder)
+            }catch (error){
+                    next(error);
+            }
         }
 
+        else if(population){
+            try{
+                let populationOrder = await Country.findAll({
+                    order: [['population', population]],
+                });
+                    return res.json(populationOrder)
+            }catch (error){
+                    next(error);
+            }        
+        
+        }else  {
+        return  res.json(allCountries) 
+        }
+    
     }catch (error){
         next(error);
     }
@@ -51,13 +99,17 @@ router.get('/:id',async (req,res,next) => {
             include: Activity
         });;
 
-        if(country) return  res.status(200).json(country);
-        else res.status(400).send('Id no match')
+        if(country) return  res.json(country);
+        else res.send('Id no match')
 
     }catch(err){
         next(err)
     }  
 })
+
+
+
+
 
 
 
