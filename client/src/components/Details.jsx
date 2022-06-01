@@ -1,11 +1,11 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 
-export default function SearchBar() { 
+export default function Detaills() { 
 
 
     return(
-        <h1>barrrrrraaaaa</h1>
+        <h1>estoy en Detalles</h1>
     )
         
 }

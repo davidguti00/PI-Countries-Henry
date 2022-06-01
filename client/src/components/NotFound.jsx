@@ -1,11 +1,11 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 
-export default function SearchBar() { 
+export default function ErrorDePagina() { 
 
 
     return(
-        <h1>barrrrrraaaaa</h1>
+        <h1>eror 404</h1>
     )
         
 }

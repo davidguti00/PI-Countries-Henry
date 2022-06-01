@@ -55,7 +55,6 @@ allcountries.then(r =>{
             area: e.area,
             population: e.population  
 			}
-
 		})
 	})
 });

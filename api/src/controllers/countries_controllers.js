@@ -1,56 +1,47 @@
 const {Op} = require ('sequelize')
-const { Country, Activity } = require ('../db')
-const { Router, query } = require ('express');
+const { Country, Activity, Country_activities } = require ('../db')
+const { Router } = require ('express');
 const router = Router();
 const axios = require ('axios');
 
 
 router.get('/', async(req, res, next)=>{
     
-    const {name, continent, order, population} = req.query;
-    
-    
+    const { continent, order, population, page} = req.query;
     
     try {
 
-        const allCountries = (await axios('https://restcountries.com/v3/all')).data.map(e=>({
-            id: e.ccn3,
-            name: e.name.common,
-            image: e.flags[0],
-            continent: e.continents[0],
-            capital: e.capital || ["Has no capital"],
-            subRegion: e.subregion || "Does not have",
-            area: e.area,
-            population: e.population
-        }));
+        const allCountries = await Country.findAll({
+            limit: 9,
+            offset: page,
+        });
         
-        if(name){
-            try{
-                let nameDb = await Country.findAll({
-                    where:{
-                        name:{[Op.iLike]: `%` + name + `%`},    
-                    },
-                        order: [['name', 'ASC']],
-                });
-                if(nameDb.length){
-                    return res.json(nameDb)
-                } else {
-                    return res.send("Country has not been created yet")
-                }
-            } catch (error){
-                next(error)
-            }
-        } 
+        // if(name){
+        //     try{
+        //         let nameDb = await Country.findAll({
+        //             where:{
+        //                 name:{[Op.iLike]: `%` + name + `%`},    
+        //             },
+        //                 order: [['name', order]],
+        //         });
+        //         if(nameDb.length){
+        //             return res.json(nameDb)
+        //         } else {
+        //             return res.send("Country has not been created yet")
+        //         }
+        //     } catch (error){
+        //         next(error)
+        //     }
+        // } 
 
-        else if(continent){
+        if(continent){
             try{
                 let continentM = await Country.findAll({
                     where:{
                         continent: continent
                     },
-                        order: [['name', 'ASC']],
-                        limit: 9
-
+                        order: [['name', order]],
+                        limit: 10
                 });
                 return res.json(continentM)
             }catch (error){
@@ -62,6 +53,8 @@ router.get('/', async(req, res, next)=>{
             try{
                 let countriesOrder = await Country.findAll({
                     order: [['name', order]],
+                    limit: 10,
+                    offset: page,
                 });
                     return res.json(countriesOrder)
             }catch (error){
@@ -73,6 +66,8 @@ router.get('/', async(req, res, next)=>{
             try{
                 let populationOrder = await Country.findAll({
                     order: [['population', population]],
+                    limit: 10,
+                    offset: page,
                 });
                     return res.json(populationOrder)
             }catch (error){
@@ -97,14 +92,33 @@ router.get('/:id',async (req,res,next) => {
         const country = await Country.findOne({
             where: { id: idCountryM },
             include: Activity
-        });;
-
+        });
         if(country) return  res.json(country);
         else res.send('Id no match')
 
     }catch(err){
         next(err)
     }  
+})
+
+router.get('/search/:name', async (req, res, next)=>{
+    const nameSeach = req.params.name;
+        try{
+            let nameDb = await Country.findAll({
+                where:{
+                    name:{[Op.iLike]: `%` + nameSeach + `%`},    
+                },
+                    order: [['name', "ASC"]],
+                    limit: 10,
+            });
+            if(nameDb.length){
+                return res.send(nameDb)
+            } else {
+                return res.send("Country has not been created yet")
+            }
+        } catch (error){
+            next(error)
+        }
 })
 
 
